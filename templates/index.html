@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    $(document).ready(() =>
+    {
+        document.getElementById("s"+window.location.href.slice(-1)).selected = "selected";
+    });
+
+    function deleteTask(id)
+    {
+        document.getElementById("delBtn"+id).disabled=true;
+        console.log(id)
+        $.ajax({
+            type: 'POST',
+            url: 'deleteTask',
+            data: 'id=' + id,
+            success: function()
+            {
+                document.getElementById(id).remove();
+            }
+        });
+    }
+
+    function showInfo(id)
+    {
+        window.location.href = '/taskInfo/' + id;
+    }
+
+    function changeStatus(id, status)
+    {
+        if (status == 0)
+        {
+            document.getElementById("statBtn"+id).disabled=true;
+        }
+        else if (status == 1)
+        {
+            document.getElementById("successBtn"+id).disabled=true;
+        }
+        $.ajax ({
+            type: 'POST',
+            url: 'changeStatus',
+            data: 'id=' + id + '&status=' + status,
+            success: function()
+            {
+                window.location.href = '/';
+            }
+        });
+    }
+
+    function sortList(val)
+    {
+        window.location.href = '/' + val;
+    }
+</script>
+</head>
+
+<body>
+{% include 'navbar.html' %}
+
+    <select class="form-select" onchange="sortList(value)" style="margin-left: 10%; margin-top: 20px; width: 14%">
+        <option value="">---</option>
+        <option id="s3" value="3">Все задачи</option>
+        <option id="s0" value="0">📍К выполнению📍</option>
+        <option id="s1" value="1">💼Задачи в работе💼</option>
+        <option id="s2" value="2">✅Выполненные задачи✅</option>
+    </select>
+
+
+<div style="display: flex; justify-content: center; margin-top: 50px">
+
+    <div style="display: flex; width: 80%; flex-wrap: wrap">
+        {% for item in tasks %}
+            <div class="card" style="width: 18rem" id="{{item.ID}}">
+                <div class="card-body">
+                    <h5 class="card-title" style="cursor: pointer" onclick="showInfo({{item.ID}})"> {{item.Title}}</h5>
+                    {% if item.Status == 0 %}
+                        <p class="card-text"> 📍 К выполнению </p>
+                    {% elif item.Status == 1 %}
+                        <p class="card-text"> 💼 В работе </p>
+                    {% elif item.Status == 2 %}
+                        <p class="card-text"> ✅ Выполнена! </p>
+                    {% endif %}
+
+
+                    <div style="display:flex; justify-self: left">
+                        {% if item.Status == 0 %}
+                            <button class="btn btn-primary" style="width: 150px" id="statBtn{{item.ID}}"
+                                    onclick="changeStatus({{item.ID}}, {{item.Status}})">В работу</button>
+
+                        {% elif item.Status == 1 %}
+                            <button class="btn btn-success" style="width: 150px" id="successBtn{{item.ID}}"
+                                    onclick="changeStatus({{item.ID}}, {{item.Status}})">Завершить</button>
+                        {% endif %}
+                        <button class="btn btn-danger" style="margin-left: 10%" onclick="deleteTask({{item.ID}})"
+                                id="delBtn{{item.ID}}">Удалить</button>
+                    </div>
+
+
+                    <br>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <p id="tasksContainer"></p>
+</div>
+</body>
+</html>

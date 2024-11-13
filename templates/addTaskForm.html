@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).ready(() =>
+        {
+            $("form").submit(function (e){
+                e.preventDefault();
+                let p = document.getElementById("success-text");
+                p.style = "color: black";
+                p.innerHTML = "Добавление...";
+                document.getElementById("inp").disabled=true;
+                console.log($('form').serialize());
+                $.ajax({
+                    type: 'POST',
+                    url: 'addTask',
+                    data: $('form').serialize(),
+                    success: function()
+                    {
+                        p.style = "color: green";
+                        document.getElementById("success-text").innerHTML = "Задача успешно добавлена!";
+                        document.getElementById("inp").disabled=false;
+                    }
+                });
+
+            });
+        });
+    </script>
+</head>
+<body>
+{% include 'navbar.html' %}
+
+<div style="display: flex; justify-content: center; width: 100%; justify-self: center; margin-top: 50px">
+    <form id="mainForm" style="width: 70%">
+        <p>Название задачи</p>
+        <input class="form-control" type="text" name="title">
+
+        <p>Описание задачи</p>
+        <input class="form-control" type="text" name="desc">
+
+        <input type="submit" value="Создать" class="btn btn-primary" id="inp" style="margin-top: 10px;">
+        <p style="color: green" id="success-text"></p>
+    </form>
+</div>
+</body>
+</html>
